@@ -1,0 +1,271 @@
+/* Shared UI component styles, matched to the StoqWise Design Document.
+   All values come from tokens.css. */
+
+/* ---------- Button (section 6: Buttons) ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target);
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: var(--font-size-control);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+/* Primary (save, complete sale, add): teal with white text */
+.btn--primary {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+/* Secondary (cancel, edit, view): white with a grey border */
+.btn--secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+.btn--secondary:hover:not(:disabled) {
+  background: var(--color-page);
+  color: var(--color-primary-hover);
+}
+
+/* Danger (delete): red with white text */
+.btn--danger {
+  background: var(--color-danger);
+  color: #ffffff;
+}
+.btn--danger:hover:not(:disabled) {
+  background: #991b1b;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* ---------- Field: Input and Select (section 6: Forms) ---------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+/* Visible label above the control */
+.field__label {
+  font-size: var(--font-size-control);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.field__required {
+  color: var(--color-danger);
+}
+
+.field__control {
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+}
+
+.field__control::placeholder {
+  color: var(--color-muted);
+}
+
+.field__control:disabled {
+  background: var(--color-page);
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+/* Error: red border and a red message under the field */
+.field--error .field__control {
+  border-color: var(--color-danger);
+}
+
+/* Focus: teal border and a 2 px teal ring (declared after error so focus wins) */
+.field__control:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
+}
+
+/* Hint below the field */
+.field__hint {
+  font-size: var(--font-size-small);
+  color: var(--color-muted);
+}
+
+.field__error {
+  font-size: var(--font-size-small);
+  color: var(--color-danger);
+}
+
+/* ---------- Tag (section 6: Status, alerts and feedback) ---------- */
+.tag {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-tag);
+  border: 1px solid;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.tag--in-stock {
+  background: var(--color-surface);
+  color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+/* Low stock: amber fill, dashed border, bold text */
+.tag--low-stock {
+  background: var(--color-low-fill);
+  color: var(--color-low-text);
+  border-color: var(--color-low-text);
+  border-style: dashed;
+  font-weight: var(--font-weight-bold);
+}
+
+/* Out of stock: red border, bold text */
+.tag--out-of-stock {
+  background: var(--color-surface);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+  border-width: 2px;
+  font-weight: var(--font-weight-bold);
+}
+
+/* ---------- Card (white surface, 1 px border, very light shadow) ---------- */
+.card {
+  background: var(--color-surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+}
+
+.card__title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-table);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+  color: var(--color-muted);
+}
+
+.card__body {
+  color: var(--color-text);
+}
+
+/* ---------- Table (14 px text, white surface) ---------- */
+/* The wrapper scrolls sideways on phones so wide tables never break the layout */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--color-surface);
+  border: var(--border);
+  border-radius: var(--radius);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-table);
+  font-weight: var(--font-weight-regular);
+}
+
+.table th,
+.table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: var(--border);
+  white-space: nowrap;
+}
+
+.table th {
+  background: var(--color-page);
+  color: var(--color-muted);
+  font-weight: var(--font-weight-semibold);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table .num {
+  text-align: right;
+}
+
+.table__empty {
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  color: var(--color-muted);
+}
+
+/* ---------- Banner (low-stock alert, sale recorded) ---------- */
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.banner__content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.banner__label {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Warning (low stock): amber fill, dashed border, text label */
+.banner--warning {
+  background: var(--color-low-fill);
+  color: var(--color-low-text);
+  border: 2px dashed var(--color-low-text);
+}
+
+/* Success: green border and text */
+.banner--success {
+  background: var(--color-surface);
+  color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+/* Danger: red border and text */
+.banner--danger {
+  background: var(--color-surface);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
