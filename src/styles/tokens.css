@@ -1,0 +1,66 @@
+/* StoqWise design tokens
+   Source: StoqWise Design Document (Deliverable 2), sections 4, 5 and 6.
+   Every colour, size and spacing value used in the app comes from here.
+   Do not hard-code values elsewhere. */
+
+:root {
+  /* ---- Colours (section 4) ---- */
+  --color-primary: #0f766e;        /* buttons, active menu item, links */
+  --color-primary-hover: #115e59;  /* hover and pressed state */
+  --color-page: #f7f7f5;           /* behind all screens */
+  --color-surface: #ffffff;        /* cards and tables */
+  --color-text: #1f2937;           /* headings and body */
+  --color-muted: #4b5563;          /* labels and hints */
+  --color-border: #d9d9d4;         /* dividers and outlines */
+  --color-low-fill: #fef3c7;       /* low-stock alert and tag background */
+  --color-low-text: #92400e;       /* low-stock text and border */
+  --color-danger: #b91c1c;         /* delete and errors */
+  --color-success: #15803d;        /* sale recorded, saved */
+  --color-chart-accent: #d97706;   /* highlights a problem in charts */
+  --color-chart-neutral: #475569;  /* secondary chart data */
+
+  /* ---- Spacing scale, 4 px base (section 6) ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* ---- Corners, borders, shadow (section 6) ---- */
+  --radius: 8px;       /* buttons, inputs, cards */
+  --radius-tag: 6px;   /* tags */
+  --border: 1px solid var(--color-border);
+  --shadow-card: 0 1px 2px rgba(31, 41, 55, 0.06); /* very light shadow on cards */
+
+  /* ---- Typography (section 5) ---- */
+  --font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --font-size-page-title: 28px;   /* bold 700 */
+  --font-size-section: 20px;      /* semibold 600 */
+  --font-size-stat: 28px;         /* dashboard numbers, bold 700 */
+  --font-size-body: 16px;         /* regular 400 */
+  --font-size-control: 15px;      /* buttons and form labels, semibold 600 */
+  --font-size-table: 14px;        /* regular 400 */
+  --font-size-small: 13px;        /* hints and tags, regular 400. Never go smaller. */
+
+  --line-height-body: 1.5;
+  --line-height-heading: 1.2;
+
+  /* ---- Sizing and layout (sections 3.2 and 6) ---- */
+  --touch-target: 44px;      /* minimum height of buttons and fields */
+  --sidebar-width: 220px;    /* desktop sidebar */
+  --content-max: 1280px;     /* widest the content area gets */
+
+  /* ---- Focus ---- */
+  /* Form fields: teal border plus a 2 px teal ring */
+  --focus-ring: 0 0 0 2px var(--color-primary);
+  /* Buttons and links: same teal ring with a small white gap, so it still shows on teal buttons */
+  --focus-ring-offset: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-primary);
+
+  /* Breakpoints (media queries cannot read variables, so write the numbers):
+     Desktop: 1024px and wider. Tablet: 640px to 1023px. Phone: under 640px. */
+}
