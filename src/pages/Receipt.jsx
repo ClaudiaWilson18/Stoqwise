@@ -1,3 +1,4 @@
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Plus, Printer, History } from 'lucide-react';
 import { Button, Banner } from '../components/ui';
 import '../styles/sales.css';
@@ -21,22 +22,36 @@ const DEFAULT_SALE = {
 };
 
 export default function Receipt() {
-  const sale = DEFAULT_SALE;
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // If navigated from RecordSale with completed sale state, use it;
+  // otherwise fallback to the agreed mock sale data
+  const sale = location.state?.sale || DEFAULT_SALE;
 
   const handlePrint = () => {
     window.print();
   };
 
   const handleNewSale = () => {
-    window.location.href = '/sales/new';
+    navigate('/sales/new');
   };
 
   const handleViewHistory = () => {
-    window.location.href = '/sales';
+    navigate('/sales');
   };
 
   return (
     <section className="receipt-page">
+      <button
+        type="button"
+        className="sale-back-btn"
+        onClick={() => navigate('/sales/new')}
+        aria-label="Back to Record Sale"
+      >
+        &lsaquo; Back to Record Sale
+      </button>
+
       {/* Banner using exact text requested in design document */}
       <div className="receipt-banner-wrap">
         <Banner variant="success">Sale recorded. Stock updated.</Banner>

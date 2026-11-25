@@ -155,6 +155,15 @@ export default function RecordSale() {
 
   return (
     <section className="sale-page">
+      <button
+        type="button"
+        className="sale-back-btn"
+        onClick={() => navigate('/dashboard')}
+        aria-label="Back to Dashboard"
+      >
+        &lsaquo; Back to Dashboard
+      </button>
+
       <header className="sale-header">
         <div className="sale-title-wrap">
           <h1 className="sale-title">Record Sale</h1>
