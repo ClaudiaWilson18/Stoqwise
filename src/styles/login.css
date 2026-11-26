@@ -72,3 +72,13 @@
 .login-card button:hover {
     background: #b45309;
 }
+.login-switch {
+    margin: 16px 0 0;
+    font-size: 14px;
+    text-align: center;
+    color: #475569;
+}
+
+.login-switch a {
+    color: #b45309;
+}
