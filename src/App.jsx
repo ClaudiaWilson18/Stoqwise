@@ -8,6 +8,7 @@ import RecordSale from './pages/RecordSale'
 import Receipt from './pages/Receipt'
 import SalesHistory from './pages/SalesHistory'
 import Reports from './pages/Reports'
+import AppLayout from './components/layout/AppLayout'
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/inventory/new" element={<ProductForm />} />
@@ -22,6 +24,7 @@ export default function App() {
         <Route path="/receipt" element={<Receipt />} />
         <Route path="/sales" element={<SalesHistory />} />
         <Route path="/reports" element={<Reports />} />
+          </Route>
       </Routes>
   )
 }
