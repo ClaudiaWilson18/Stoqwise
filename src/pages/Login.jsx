@@ -1,3 +1,4 @@
+import '../styles/login.css'
 export default function Login() {
   return (
       <main className="login-page">
