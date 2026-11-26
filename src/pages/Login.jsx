@@ -1,4 +1,5 @@
 import '../styles/login.css'
+import { Link } from 'react-router-dom'
 export default function Login() {
   return (
       <main className="login-page">
@@ -22,7 +23,9 @@ export default function Login() {
               placeholder="Enter your password"
           />
 
-          <button type="submit">Log in</button>
+            <button type="submit">Log in</button>
+            <p className="login-switch">
+                No account? <Link to="/register">Create one</Link></p>
         </form>
       </main>
   )
