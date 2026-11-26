@@ -9,7 +9,7 @@ export function positiveNumber(value) {
 
 export function wholeNumber(value) {
     const n = Number(value)
-    return Number.isInteger(n) && n >= 0 ? '' : 'Enter a whole number, such as 5'
+    return String(value ?? '').trim() !== '' && Number.isInteger(n) && n >= 0 ? '' : 'Enter a whole number, such as 5'
 }
 
 export function usernameOrEmail(value) {
