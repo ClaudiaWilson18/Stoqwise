@@ -8,6 +8,9 @@ import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ProductsProvider } from './context/ProductsContext'
 import { SalesProvider } from './context/SalesContext'
+import { getProducts, recordSale } from './data/productService';
+console.log(getProducts().length);                  // 25
+console.log(recordSale('Test', [{ productId: 1, quantity: 3 }]));
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
