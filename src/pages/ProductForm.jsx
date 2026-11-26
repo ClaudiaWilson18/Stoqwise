@@ -1,22 +1,39 @@
+import { useNavigate, useParams } from "react-router-dom";
 import "../styles/inventory.css";
+
+// Change this if the path in App.jsx is different.
+const INVENTORY_PATH = "/inventory";
 
 const CATEGORIES = ["Beverages", "Groceries", "Pharmacy", "Spare parts"];
 
-// Static version (25 Nov): one form for both Add and Edit.
-// Later: read the product from useProducts when editing, run Rooney's
-// validators on Save, and call addProduct / updateProduct.
-export default function ProductForm({ mode = "add" }) {
-  const isEdit = mode === "edit";
+// One form for both Add and Edit.
+// Edit mode: the route has an id (for example /inventory/:id/edit),
+// or you pass mode="edit".
+// 30 Nov: load the product with useProducts when editing, run Rooney's
+// validators on Save, then call addProduct or updateProduct.
+export default function ProductForm({ mode }) {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = mode === "edit" || Boolean(id);
+
+  function goBack() {
+    navigate(INVENTORY_PATH);
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    // Validation and saving are added on 30 Nov.
+  }
 
   return (
     <section className="inv-page">
-      <button type="button" className="inv-back">
+      <button type="button" className="inv-back" onClick={goBack}>
         &lsaquo; Back to Inventory
       </button>
 
       <h1 className="inv-title">{isEdit ? "Edit product" : "Add product"}</h1>
 
-      <form className="inv-card pf-form" onSubmit={(e) => e.preventDefault()} noValidate>
+      <form className="inv-card pf-form" onSubmit={handleSubmit} noValidate>
         <div className="pf-group">
           <label htmlFor="pf-name" className="pf-label">
             Product name
@@ -74,7 +91,7 @@ export default function ProductForm({ mode = "add" }) {
           <button type="submit" className="inv-btn inv-btn--primary">
             Save product
           </button>
-          <button type="button" className="inv-btn inv-btn--secondary">
+          <button type="button" className="inv-btn inv-btn--secondary" onClick={goBack}>
             Cancel
           </button>
         </div>

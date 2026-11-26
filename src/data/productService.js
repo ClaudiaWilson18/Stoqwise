@@ -35,6 +35,24 @@ export const getUsers = () => load(KEYS.users, seedUsers);
 export const getProducts = () => load(KEYS.products, seedProducts);
 export const getSales = () => load(KEYS.sales, seedSales);
 
+export function addUser({ name, username, password }) {
+  const users = getUsers();
+  const taken = users.some(
+      (u) => u.username.toLowerCase() === username.trim().toLowerCase()
+  );
+  if (taken) return { ok: false, error: 'That username is already taken' };
+
+  const user = {
+    id: nextId(users),
+    name: name.trim(),
+    username: username.trim(),
+    password,
+    role: 'Sales Staff',
+  };
+  save(KEYS.users, [...users, user]);
+  return { ok: true, user };
+}
+
 export function getProductById(id) {
   return getProducts().find((p) => p.id === id) || null;
 }
