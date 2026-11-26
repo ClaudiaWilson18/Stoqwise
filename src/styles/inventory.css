@@ -244,3 +244,22 @@
     gap: 0;
   }
 }
+
+/* ---------- Empty state ---------- */
+.inv-empty {
+  background: #fff;
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  padding: 32px 24px;
+  text-align: center;
+}
+.inv-empty-title {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 600;
+}
+.inv-empty-text {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--c-muted);
+}
