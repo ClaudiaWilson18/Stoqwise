@@ -1,22 +1,22 @@
 import { NavLink } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import { LayoutDashboard, Package, ShoppingCart, ClipboardList, TrendingUp } from 'lucide-react'
 
 const NAV_LINKS = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['Admin', 'Sales Staff'] },
-    { to: '/inventory', label: 'Inventory', icon: Package, roles: ['Admin', 'Sales Staff'] },
+    { to: '/inventory', label: 'Inventory', icon: Package, roles: ['Admin'] },
     { to: '/sales/new', label: 'Record sale', icon: ShoppingCart, roles: ['Admin', 'Sales Staff'] },
     { to: '/sales', label: 'Sales history', icon: ClipboardList, roles: ['Admin', 'Sales Staff'] },
     { to: '/reports', label: 'Reports', icon: TrendingUp, roles: ['Admin'] },
 ]
 
 export default function Sidebar() {
-    // TEMPORARY: replace with useAuth() once Nana's AuthContext is merged
-    const role = 'Admin'
+    const { role } = useAuth()
 
     const links = NAV_LINKS.filter((link) => link.roles.includes(role))
 
     return (
-        <nav style={{ width: 220, padding: 16, borderRight: '1px solid #ddd' }}>
+        <nav className="sidebar" style={{ width: 220, padding: 16, borderRight: '1px solid #ddd' }}>
             <h2 style={{ marginTop: 0 }}>Stoqwise</h2>
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                 {links.map(({ to, label, icon: Icon }) => (

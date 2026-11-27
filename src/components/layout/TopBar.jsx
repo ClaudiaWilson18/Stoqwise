@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
-
+import { useAuth } from '../../context/AuthContext'
 const PAGE_TITLES = {
     '/dashboard': 'Dashboard',
     '/inventory': 'Inventory',
@@ -15,18 +15,18 @@ export default function TopBar() {
     const { pathname } = useLocation()
     const navigate = useNavigate()
 
-    // TEMPORARY: replace with useAuth() once Nana's AuthContext is merged
-    const user = { name: 'Admin', role: 'Admin' }
+    const { user, dispatch } = useAuth()
 
     const title = PAGE_TITLES[pathname] || 'Stoqwise'
 
     function handleLogout() {
-        // TEMPORARY: call logout() from useAuth() here once it exists
+        dispatch({ type: 'LOGOUT' })
         navigate('/login')
     }
 
     return (
         <header
+            className="topbar"
             style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -39,7 +39,7 @@ export default function TopBar() {
             <h1 style={{ margin: 0, fontSize: 20 }}>{title}</h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <span>
-          {user.name} ({user.role})
+                  {user?.name} ({user?.role})
         </span>
                 <button
                     onClick={handleLogout}

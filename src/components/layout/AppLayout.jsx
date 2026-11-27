@@ -4,11 +4,11 @@ import TopBar from './TopBar'
 
 export default function AppLayout() {
     return (
-        <div style={{ display: 'flex', minHeight: '100vh' }}>
+        <div className="app-layout" style={{ display: 'flex', minHeight: '100vh' }}>
             <Sidebar />
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <TopBar />
-                <main style={{ flex: 1, padding: 16 }}>
+                <main className="app-main" style={{ flex: 1, padding: 16 }}>
                     <Outlet />
                 </main>
             </div>
