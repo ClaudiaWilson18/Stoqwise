@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Minus, Trash2, ShoppingCart, Search, AlertCircle } from 'lucide-react';
-import { Button, Tag, Input, Select, Table, Card } from '../components/ui';
+import { Plus, Minus, Trash2, ShoppingCart, Search } from 'lucide-react';
+import { Button, Tag, Input, Select, Table, Card, Banner } from '../components/ui';
 import { getStockStatus } from '../utils/stock';
 import { positiveNumber, wholeNumber } from '../utils/validators';
 import { CATEGORIES as SHARED_CATEGORIES } from '../data/categories';
@@ -258,8 +258,8 @@ export default function RecordSale() {
           />
         </Card>
 
-        {/* RIGHT COLUMN: Current sale with quantities, errors, total */}
-        <section className="sale-panel" aria-label="Current Sale Cart">
+        {/* RIGHT COLUMN: Current sale with quantities, errors, total using Alex's Card & Banner */}
+        <Card className="sale-cart-card">
           <div className="sale-panel-header">
             <h2 className="sale-panel-title">
               <ShoppingCart size={20} aria-hidden="true" />
@@ -268,15 +268,14 @@ export default function RecordSale() {
             <span className="sale-count-badge">{totalItemsCount} items</span>
           </div>
 
-          {/* Error area for quantity/stock violations */}
+          {/* Error area for quantity/stock violations using Alex's Banner */}
           {stockErrors.length > 0 && (
-            <div className="sale-error-box" role="alert">
-              <AlertCircle size={18} aria-hidden="true" />
-              <div>
-                {stockErrors.map((err, i) => (
-                  <div key={i}>{err}</div>
-                ))}
-              </div>
+            <div className="sale-error-wrap">
+              {stockErrors.map((err, i) => (
+                <Banner key={i} variant="danger" label="Quantity error">
+                  {err}
+                </Banner>
+              ))}
             </div>
           )}
 
@@ -381,7 +380,7 @@ export default function RecordSale() {
               </Button>
             )}
           </div>
-        </section>
+        </Card>
       </div>
     </section>
   );
