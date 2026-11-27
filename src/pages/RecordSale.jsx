@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Minus, Trash2, ShoppingCart, Search, AlertCircle } from 'lucide-react';
-import { Button, Tag } from '../components/ui';
+import { Button, Tag, Input, Select, Table, Card } from '../components/ui';
 import { getStockStatus } from '../utils/stock';
 import { positiveNumber, wholeNumber } from '../utils/validators';
 import { CATEGORIES as SHARED_CATEGORIES } from '../data/categories';
@@ -153,6 +153,53 @@ export default function RecordSale() {
     navigate('/receipt', { state: { sale: completedSale } });
   };
 
+  // Table columns definition for Alex's Table component
+  const productColumns = useMemo(
+    () => [
+      {
+        key: 'name',
+        label: 'Product',
+        render: (p) => (
+          <div>
+            <div className="sale-product-name">{p.name}</div>
+            <div className="sale-product-cat">{p.category}</div>
+          </div>
+        ),
+      },
+      {
+        key: 'status',
+        label: 'Status',
+        render: (p) => <Tag status={getStockStatus(p)} />,
+      },
+      {
+        key: 'price',
+        label: 'Price',
+        numeric: true,
+        render: (p) => `GH₵ ${p.price.toFixed(2)}`,
+      },
+      {
+        key: 'quantity',
+        label: 'Stock',
+        numeric: true,
+      },
+      {
+        key: 'action',
+        label: 'Action',
+        render: (p) => (
+          <Button
+            variant="secondary"
+            onClick={() => handleAddToCart(p)}
+            disabled={p.quantity === 0}
+            aria-label={`Add ${p.name} to sale`}
+          >
+            + Add
+          </Button>
+        ),
+      },
+    ],
+    []
+  );
+
   return (
     <section className="sale-page">
       <button
@@ -176,8 +223,8 @@ export default function RecordSale() {
       </header>
 
       <div className="sale-grid">
-        {/* LEFT COLUMN: Product search & catalog */}
-        <section className="sale-panel" aria-label="Product Search and Catalog">
+        {/* LEFT COLUMN: Product search & catalog using Alex's Card, Input, Select, Table */}
+        <Card className="sale-catalog-card">
           <div className="sale-panel-header">
             <h2 className="sale-panel-title">
               <Search size={20} aria-hidden="true" />
@@ -187,79 +234,29 @@ export default function RecordSale() {
           </div>
 
           <div className="sale-search-bar">
-            <input
+            <Input
+              label="Search products"
               type="search"
-              className="sale-search-input"
               placeholder="Search products by name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              aria-label="Search products"
             />
-            <select
-              className="sale-filter-select"
+            <Select
+              label="Category"
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              aria-label="Filter by category"
-            >
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat === 'All' ? 'All categories' : cat}
-                </option>
-              ))}
-            </select>
+              options={categories}
+            />
           </div>
 
-          <div className="sale-product-table-wrap">
-            <table className="sale-product-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Status</th>
-                  <th className="num">Price</th>
-                  <th className="num">Stock</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProducts.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="sale-cart-empty">
-                      No products match your search.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredProducts.map((p) => {
-                    const status = getStockStatus(p);
-                    const isOut = p.quantity === 0;
-                    return (
-                      <tr key={p.id}>
-                        <td>
-                          <div className="sale-product-name">{p.name}</div>
-                          <div className="sale-product-cat">{p.category}</div>
-                        </td>
-                        <td>
-                          <Tag status={status} />
-                        </td>
-                        <td className="num sale-product-price">GH₵ {p.price.toFixed(2)}</td>
-                        <td className="num">{p.quantity}</td>
-                        <td>
-                          <Button
-                            variant="secondary"
-                            onClick={() => handleAddToCart(p)}
-                            disabled={isOut}
-                            aria-label={`Add ${p.name} to sale`}
-                          >
-                            + Add
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
+          <Table
+            columns={productColumns}
+            rows={filteredProducts}
+            rowKey="id"
+            caption="Available Products"
+            emptyMessage="No products match your search."
+          />
+        </Card>
 
         {/* RIGHT COLUMN: Current sale with quantities, errors, total */}
         <section className="sale-panel" aria-label="Current Sale Cart">
