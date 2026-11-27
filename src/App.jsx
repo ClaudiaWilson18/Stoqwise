@@ -9,22 +9,30 @@ import Receipt from './pages/Receipt'
 import SalesHistory from './pages/SalesHistory'
 import Reports from './pages/Reports'
 import AppLayout from './components/layout/AppLayout'
+import ProtectedRoute from './components/ProtectedRoute'
+import RoleRoute from './components/RoleRoute'
 
 export default function App() {
   return (
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route element={<AppLayout />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/inventory" element={<Inventory />} />
-        <Route path="/inventory/new" element={<ProductForm />} />
-        <Route path="/sales/new" element={<RecordSale />} />
-        <Route path="/receipt" element={<Receipt />} />
-        <Route path="/sales" element={<SalesHistory />} />
-        <Route path="/reports" element={<Reports />} />
+    <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/sales/new" element={<RecordSale />} />
+          <Route path="/receipt" element={<Receipt />} />
+          <Route path="/sales" element={<SalesHistory />} />
+
+          <Route element={<RoleRoute allowedRoles={['Admin']} />}>
+            <Route path="/inventory" element={<Inventory />} />
+            <Route path="/inventory/new" element={<ProductForm />} />
+            <Route path="/reports" element={<Reports />} />
           </Route>
-      </Routes>
+        </Route>
+      </Route>
+    </Routes>
   )
 }
