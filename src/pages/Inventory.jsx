@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "../styles/inventory.css";
+import { CATEGORIES } from "../data/categories";
 
 // Change these three if the paths in App.jsx are different.
 const INVENTORY_PATH = "/inventory";
@@ -19,8 +20,6 @@ const INITIAL_PRODUCTS = [
   { id: 7, name: "Engine Oil 4L", category: "Spare parts", price: 185.0, quantity: 3, threshold: 6 },
   { id: 8, name: "Bottled Water 1.5L", category: "Beverages", price: 5.0, quantity: 96, threshold: 24 },
 ];
-
-const CATEGORIES = ["Beverages", "Groceries", "Pharmacy", "Spare parts"];
 
 // 0 = Out of stock, at or below threshold = Low stock, otherwise In stock.
 function getStockStatus(product) {
