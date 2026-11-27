@@ -137,6 +137,10 @@
   margin-bottom: var(--space-4);
 }
 
+.sale-search-bar .field {
+  margin-bottom: 0;
+}
+
 .sale-search-input {
   width: 100%;
   min-height: var(--touch-target);
@@ -620,10 +624,17 @@
 
   .receipt-banner-wrap,
   .receipt-actions,
+  .sale-back-btn,
   .inv-header,
   header,
-  nav {
+  nav,
+  aside {
     display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   .receipt-card {
