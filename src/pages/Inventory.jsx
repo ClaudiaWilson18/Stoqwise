@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Button, Input, Select, Tag, Table } from "../components/ui";
 import "../styles/inventory.css";
 
-// Change these three if the paths in App.jsx are different.
-const INVENTORY_PATH = "/inventory";
+// Change these two if the paths in App.jsx are different.
 const NEW_PRODUCT_PATH = "/inventory/new";
 const editPath = (id) => `/inventory/${id}/edit`;
 
@@ -20,14 +21,28 @@ const INITIAL_PRODUCTS = [
   { id: 8, name: "Bottled Water 1.5L", category: "Beverages", price: 5.0, quantity: 96, threshold: 24 },
 ];
 
-const CATEGORIES = ["Beverages", "Groceries", "Pharmacy", "Spare parts"];
+const CATEGORY_OPTIONS = [
+  { value: "", label: "All categories" },
+  "Beverages",
+  "Groceries",
+  "Pharmacy",
+  "Spare parts",
+];
 
-// 0 = Out of stock, at or below threshold = Low stock, otherwise In stock.
-function getStockStatus(product) {
-  if (product.quantity === 0) return "Out of stock";
-  if (product.quantity <= product.threshold) return "Low stock";
-  return "In stock";
-}
+const STATUS_OPTIONS = [
+  { value: "", label: "All stock statuses" },
+  { value: "in", label: "In stock" },
+  { value: "low", label: "Low stock" },
+  { value: "out", label: "Out of stock" },
+];
+
+const SORT_OPTIONS = [
+  { value: "", label: "Default order" },
+  { value: "name", label: "Name (A to Z)" },
+  { value: "price-asc", label: "Price (low to high)" },
+  { value: "price-desc", label: "Price (high to low)" },
+  { value: "quantity-asc", label: "Quantity (low to high)" },
+];
 
 // Maps the filter value (and the ?status= link) to the status text.
 const STATUS_FILTERS = {
@@ -43,15 +58,12 @@ const SORTERS = {
   "quantity-asc": (a, b) => a.quantity - b.quantity,
 };
 
-// Swap for Alex's <Tag /> component when you switch to his components.
-function StatusTag({ status }) {
-  const cls =
-    status === "Low stock"
-      ? "inv-tag inv-tag--low"
-      : status === "Out of stock"
-      ? "inv-tag inv-tag--out"
-      : "inv-tag inv-tag--in";
-  return <span className={cls}>{status}</span>;
+// 0 = Out of stock, at or below threshold = Low stock, otherwise In stock.
+// On 28 Nov use Alfred's getStockStatus instead of this copy.
+function getStockStatus(product) {
+  if (product.quantity === 0) return "Out of stock";
+  if (product.quantity <= product.threshold) return "Low stock";
+  return "In stock";
 }
 
 export default function Inventory() {
@@ -90,136 +102,99 @@ export default function Inventory() {
   }
 
   function handleDelete(product) {
-    // Proper confirmation box comes on 30 Nov.
-    // On 28 Nov replace the setProducts line with deleteProduct(product.id).
+    // 30 Nov: replace with a proper confirmation box.
+    // 28 Nov: replace the setProducts line with deleteProduct(product.id).
     if (window.confirm(`Delete "${product.name}"? This cannot be undone.`)) {
       setProducts((prev) => prev.filter((p) => p.id !== product.id));
     }
   }
 
+  const columns = [
+    { key: "name", label: "Product" },
+    { key: "category", label: "Category" },
+    {
+      key: "price",
+      label: "Price",
+      numeric: true,
+      render: (p) => `GH₵ ${p.price.toFixed(2)}`,
+    },
+    { key: "quantity", label: "Quantity", numeric: true },
+    { key: "threshold", label: "Threshold", numeric: true },
+    {
+      key: "status",
+      label: "Status",
+      render: (p) => <Tag status={getStockStatus(p)} />,
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      render: (p) => (
+        <div className="inv-actions">
+          <Button
+            variant="secondary"
+            icon={Pencil}
+            onClick={() => navigate(editPath(p.id))}
+          >
+            Edit
+          </Button>
+          <Button variant="danger" icon={Trash2} onClick={() => handleDelete(p)}>
+            Delete
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <section className="inv-page">
       <header className="inv-header">
         <h1 className="inv-title">Inventory</h1>
-        <button
-          type="button"
-          className="inv-btn inv-btn--primary"
-          onClick={() => navigate(NEW_PRODUCT_PATH)}
-        >
-          + Add product
-        </button>
+        <Button icon={Plus} onClick={() => navigate(NEW_PRODUCT_PATH)}>
+          Add product
+        </Button>
       </header>
 
       <div className="inv-controls">
-        <input
+        <Input
+          label="Search products"
           type="search"
-          className="inv-field"
           placeholder="Search products"
-          aria-label="Search products"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <select
-          className="inv-field"
-          aria-label="Category"
+        <Select
+          label="Category"
+          options={CATEGORY_OPTIONS}
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="">All categories</option>
-          {CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-        <select
-          className="inv-field"
-          aria-label="Stock status"
+        />
+        <Select
+          label="Stock status"
+          options={STATUS_OPTIONS}
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-        >
-          <option value="">All stock statuses</option>
-          <option value="in">In stock</option>
-          <option value="low">Low stock</option>
-          <option value="out">Out of stock</option>
-        </select>
-        <select
-          className="inv-field"
-          aria-label="Sort by"
+        />
+        <Select
+          label="Sort by"
+          options={SORT_OPTIONS}
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-        >
-          <option value="">Sort by</option>
-          <option value="name">Name (A to Z)</option>
-          <option value="price-asc">Price (low to high)</option>
-          <option value="price-desc">Price (high to low)</option>
-          <option value="quantity-asc">Quantity (low to high)</option>
-        </select>
+        />
       </div>
 
-      {rows.length === 0 ? (
-        <div className="inv-empty">
-          <p className="inv-empty-title">No products found</p>
-          <p className="inv-empty-text">
-            Try a different search, or clear the filters to see every product.
-          </p>
-          {hasFilters && (
-            <button
-              type="button"
-              className="inv-btn inv-btn--secondary"
-              onClick={clearFilters}
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className="inv-table-wrap">
-          <table className="inv-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th className="inv-num">Price</th>
-                <th className="inv-num">Quantity</th>
-                <th className="inv-num">Threshold</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.name}</td>
-                  <td>{p.category}</td>
-                  <td className="inv-num">GH₵ {p.price.toFixed(2)}</td>
-                  <td className="inv-num">{p.quantity}</td>
-                  <td className="inv-num">{p.threshold}</td>
-                  <td>
-                    <StatusTag status={getStockStatus(p)} />
-                  </td>
-                  <td>
-                    <div className="inv-actions">
-                      <button
-                        type="button"
-                        className="inv-btn inv-btn--secondary"
-                        onClick={() => navigate(editPath(p.id))}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        className="inv-btn inv-btn--danger"
-                        onClick={() => handleDelete(p)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <Table
+        columns={columns}
+        rows={rows}
+        rowKey="id"
+        caption="Products"
+        emptyMessage="No products found. Try a different search, or clear the filters."
+      />
+
+      {rows.length === 0 && hasFilters && (
+        <div className="inv-empty-actions">
+          <Button variant="secondary" onClick={clearFilters}>
+            Clear filters
+          </Button>
         </div>
       )}
 
@@ -230,12 +205,12 @@ export default function Inventory() {
             : `Showing 1 to ${rows.length} of ${rows.length} products`}
         </p>
         <div className="inv-pager">
-          <button type="button" className="inv-btn inv-btn--secondary" disabled>
+          <Button variant="secondary" disabled>
             Previous
-          </button>
-          <button type="button" className="inv-btn inv-btn--secondary" disabled>
+          </Button>
+          <Button variant="secondary" disabled>
             Next
-          </button>
+          </Button>
         </div>
       </footer>
     </section>
