@@ -1,16 +1,14 @@
+import { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Plus, Printer, History } from 'lucide-react';
-import { Button, Banner } from '../components/ui';
+import { Button, Banner, Card, Table } from '../components/ui';
 import '../styles/sales.css';
 
-// Hard-coded static sample receipt data for Phase 1 (23 Nov - 25 Nov)
-// Follows agreed Sale and Sale Item data shapes (Alfred & Nana):
-// Sale: id, receiptNumber, date, staff, items, total.
-// Sale item: productId, name, quantity, price.
+// Fallback sample receipt data matching Alfred & Nana's agreed Sale data shape
 const DEFAULT_SALE = {
-  id: 'sale-101',
-  receiptNumber: 'REC-20261123-0042',
-  date: '2026-11-23 14:35',
+  id: 101,
+  receiptNumber: 'RCP-0101',
+  date: '2026-11-25T14:35:00.000Z',
   staff: 'Newton Nsiah Arthur',
   paymentMethod: 'Cash',
   items: [
@@ -28,6 +26,44 @@ export default function Receipt() {
   // If navigated from RecordSale with completed sale state, use it;
   // otherwise fallback to the agreed mock sale data
   const sale = location.state?.sale || DEFAULT_SALE;
+
+  // Columns definition for Alex's Table component
+  const receiptColumns = useMemo(
+    () => [
+      {
+        key: 'name',
+        label: 'Item',
+        render: (item) => <span className="receipt-item-name">{item.name}</span>,
+      },
+      {
+        key: 'quantity',
+        label: 'Qty',
+        numeric: true,
+      },
+      {
+        key: 'price',
+        label: 'Price',
+        numeric: true,
+        render: (item) => `GH₵ ${item.price.toFixed(2)}`,
+      },
+      {
+        key: 'total',
+        label: 'Total',
+        numeric: true,
+        render: (item) => `GH₵ ${(item.quantity * item.price).toFixed(2)}`,
+      },
+    ],
+    []
+  );
+
+  const formattedDate = useMemo(() => {
+    try {
+      const d = new Date(sale.date);
+      return isNaN(d.getTime()) ? sale.date : d.toLocaleString();
+    } catch {
+      return sale.date;
+    }
+  }, [sale.date]);
 
   const handlePrint = () => {
     window.print();
@@ -57,7 +93,7 @@ export default function Receipt() {
         <Banner variant="success">Sale recorded. Stock updated.</Banner>
       </div>
 
-      <div className="receipt-card">
+      <Card className="receipt-card">
         {/* Brand header */}
         <div className="receipt-brand">
           <h1 className="receipt-brand-title">StoqWise</h1>
@@ -72,7 +108,7 @@ export default function Receipt() {
           </div>
           <div className="receipt-meta-item">
             <span className="receipt-meta-label">Date &amp; Time</span>
-            <span className="receipt-meta-value">{sale.date}</span>
+            <span className="receipt-meta-value">{formattedDate}</span>
           </div>
           <div className="receipt-meta-item">
             <span className="receipt-meta-label">Staff Name</span>
@@ -84,27 +120,13 @@ export default function Receipt() {
           </div>
         </div>
 
-        {/* Items breakdown table */}
-        <table className="receipt-table" aria-label="Receipt items breakdown">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th className="num">Qty</th>
-              <th className="num">Price</th>
-              <th className="num">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sale.items.map((item, index) => (
-              <tr key={item.productId || index}>
-                <td className="receipt-item-name">{item.name}</td>
-                <td className="num">{item.quantity}</td>
-                <td className="num">GH₵ {item.price.toFixed(2)}</td>
-                <td className="num">GH₵ {(item.quantity * item.price).toFixed(2)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {/* Items breakdown using Alex's Table component */}
+        <Table
+          columns={receiptColumns}
+          rows={sale.items}
+          rowKey="productId"
+          caption="Receipt items breakdown"
+        />
 
         {/* Totals */}
         <div className="receipt-totals">
@@ -127,7 +149,7 @@ export default function Receipt() {
           <p className="receipt-footer-note">Thank you for your purchase!</p>
           <p>Please keep this receipt for your records.</p>
         </div>
-      </div>
+      </Card>
 
       {/* Action buttons: New sale, Print receipt, View history */}
       <div className="receipt-actions">

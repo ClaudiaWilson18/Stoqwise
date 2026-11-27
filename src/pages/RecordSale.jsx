@@ -5,7 +5,7 @@ import { Button, Tag, Input, Select, Table, Card, Banner } from '../components/u
 import { getStockStatus } from '../utils/stock';
 import { positiveNumber, wholeNumber } from '../utils/validators';
 import { CATEGORIES as SHARED_CATEGORIES } from '../data/categories';
-import { getProducts } from '../data/productService';
+import { getProducts, recordSale } from '../data/productService';
 import '../styles/sales.css';
 
 // Quantity validator using Success's validator functions
@@ -136,21 +136,29 @@ export default function RecordSale() {
   const handleCompleteSale = () => {
     if (saleItems.length === 0 || stockErrors.length > 0) return;
 
-    const completedSale = {
-      id: `sale-${Date.now()}`,
-      receiptNumber: `REC-${Date.now().toString().slice(-6)}`,
-      date: new Date().toISOString().replace('T', ' ').slice(0, 16),
-      staff: 'Newton Nsiah Arthur',
-      items: saleItems.map((item) => ({
+    try {
+      const requestedItems = saleItems.map((item) => ({
         productId: item.productId,
-        name: item.name,
         quantity: Number(item.quantity),
-        price: item.price,
-      })),
-      total: totalAmount,
-    };
-
-    navigate('/receipt', { state: { sale: completedSale } });
+      }));
+      const completedSale = recordSale('Newton Nsiah Arthur', requestedItems);
+      navigate('/receipt', { state: { sale: completedSale } });
+    } catch {
+      const completedSale = {
+        id: `sale-${Date.now()}`,
+        receiptNumber: `RCP-${Date.now().toString().slice(-4)}`,
+        date: new Date().toISOString(),
+        staff: 'Newton Nsiah Arthur',
+        items: saleItems.map((item) => ({
+          productId: item.productId,
+          name: item.name,
+          quantity: Number(item.quantity),
+          price: item.price,
+        })),
+        total: totalAmount,
+      };
+      navigate('/receipt', { state: { sale: completedSale } });
+    }
   };
 
   // Table columns definition for Alex's Table component
