@@ -1,120 +1,145 @@
-import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
-import "../styles/inventory.css";
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { Button, Input, Select, Card } from "../components/ui";
 import { required, positiveNumber, wholeNumber } from "../utils/validators";
 import { CATEGORIES } from "../data/categories";
+import "../styles/inventory.css";
 
+// Change this if the path in App.jsx is different.
 const INVENTORY_PATH = "/inventory";
+
+const CATEGORY_OPTIONS = [{ value: "", label: "Choose a category" }, ...CATEGORIES];
+
+const EMPTY_FORM = {
+  name: "",
+  category: "",
+  price: "",
+  quantity: "",
+  threshold: "",
+};
 
 // One form for both Add and Edit.
 // Edit mode: the route has an id (for example /inventory/:id/edit),
 // or you pass mode="edit".
-// 30 Nov: load the product with useProducts when editing, run Rooney's
-// validators on Save, then call addProduct or updateProduct.
 export default function ProductForm({ mode }) {
-    const navigate = useNavigate();
-    const { id } = useParams();
-    const isEdit = mode === "edit" || Boolean(id);
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = mode === "edit" || Boolean(id);
 
-    const [form, setForm] = useState({ name: "", category: "", price: "", quantity: "", threshold: "" });
-    const [errors, setErrors] = useState({});
+  const [form, setForm] = useState(EMPTY_FORM);
+  // Each key holds an error message, or "" for no error.
+  // Example: { price: "Enter a number above 0" }
+  const [errors, setErrors] = useState({});
 
-    function handleChange(e) {
-        const { name, value } = e.target;
-        setForm((f) => ({ ...f, [name]: value }));
-    }
+  // Returns an onChange handler for one field.
+  // It also clears that field's error when the user starts typing again.
+  const update = (field) => (e) => {
+    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
 
-    function goBack() {
-        navigate(INVENTORY_PATH);
-    }
+  function goBack() {
+    navigate(INVENTORY_PATH);
+  }
 
-    function handleSubmit(e) {
-        e.preventDefault();
-        const next = {
-            name: required(form.name, "Product name"),
-            category: required(form.category, "Category"),
-            price: positiveNumber(form.price),
-            quantity: wholeNumber(form.quantity),
-            threshold: wholeNumber(form.threshold),
-        };
-        Object.keys(next).forEach((k) => { if (!next[k]) delete next[k]; });
-        setErrors(next);
-        console.log(next);
-        if (Object.keys(next).length > 0) return;
-        // Saving is added later.
-    }
+  function handleSubmit(e) {
+    e.preventDefault();
 
-    return (
-        <section className="inv-page">
-            <button type="button" className="inv-back" onClick={goBack}>
-                &lsaquo; Back to Inventory
-            </button>
+    // Each validator returns an error message, or "" when the value is fine.
+    const newErrors = {
+      name: required(form.name, "Product name"),
+      category: required(form.category, "Category"),
+      price: positiveNumber(form.price),
+      quantity: wholeNumber(form.quantity),
+      threshold: wholeNumber(form.threshold),
+    };
+    setErrors(newErrors);
 
-            <h1 className="inv-title">{isEdit ? "Edit product" : "Add product"}</h1>
+    // Stop here if any field has an error.
+    if (Object.values(newErrors).some((msg) => msg !== "")) return;
 
-            <form className="inv-card pf-form" onSubmit={handleSubmit} noValidate>
-                <div className="pf-group">
-                    <label htmlFor="pf-name" className="pf-label">
-                        Product name
-                    </label>
-                    <input id="pf-name" name="name" type="text" className="inv-field" value={form.name} onChange={handleChange} />
-                    <p className="pf-hint">Enter the name customers know it by.</p>
-                </div>
+    // Everything is valid.
+    // 28 Nov onward: call addProduct(form) or updateProduct(id, form)
+    // from useProducts, then goBack().
+  }
 
-                <div className="pf-group">
-                    <label htmlFor="pf-category" className="pf-label">
-                        Category
-                    </label>
-                    <select id="pf-category" name="category" className="inv-field" value={form.category} onChange={handleChange}>
-                        <option value="" disabled>
-                            Choose a category
-                        </option>
-                        {CATEGORIES.map((c) => (
-                            <option key={c} value={c}>
-                                {c}
-                            </option>
-                        ))}
-                    </select>
-                    <p className="pf-hint">Pick the group this product belongs to.</p>
-                </div>
+  return (
+    <section className="inv-page">
+      <div className="inv-back">
+        <Button variant="secondary" icon={ArrowLeft} onClick={goBack}>
+          Back to Inventory
+        </Button>
+      </div>
 
-                <div className="pf-row">
-                    <div className="pf-group">
-                        <label htmlFor="pf-price" className="pf-label">
-                            Price
-                        </label>
-                        <input id="pf-price" name="price" type="number" min="0" step="0.01" className="inv-field" value={form.price} onChange={handleChange} />
-                        <p className="pf-hint">Price per unit. Must be above 0.</p>
-                    </div>
+      <h1 className="inv-title">{isEdit ? "Edit product" : "Add product"}</h1>
 
-                    <div className="pf-group">
-                        <label htmlFor="pf-quantity" className="pf-label">
-                            Quantity in stock
-                        </label>
-                        <input id="pf-quantity" name="quantity" type="number" min="0" step="1" className="inv-field" value={form.quantity} onChange={handleChange} />
-                        <p className="pf-hint">Whole number, 0 or more.</p>
-                    </div>
-                </div>
+      <Card className="pf-card">
+        <form onSubmit={handleSubmit} noValidate className="pf-form">
+          <Input
+            label="Product name"
+            value={form.name}
+            onChange={update("name")}
+            hint="Enter the name customers know it by."
+            error={errors.name}
+            required
+          />
 
-                <div className="pf-group">
-                    <label htmlFor="pf-threshold" className="pf-label">
-                        Low-stock threshold
-                    </label>
-                    <input id="pf-threshold" name="threshold" type="number" min="0" step="1" className="inv-field" value={form.threshold} onChange={handleChange} />
-                    <p className="pf-hint">
-                        You get a low-stock alert when quantity falls below this number
-                    </p>
-                </div>
+          <Select
+            label="Category"
+            options={CATEGORY_OPTIONS}
+            value={form.category}
+            onChange={update("category")}
+            hint="Pick the group this product belongs to."
+            error={errors.category}
+            required
+          />
 
-                <div className="pf-buttons">
-                    <button type="submit" className="inv-btn inv-btn--primary">
-                        Save product
-                    </button>
-                    <button type="button" className="inv-btn inv-btn--secondary" onClick={goBack}>
-                        Cancel
-                    </button>
-                </div>
-            </form>
-        </section>
-    );
+          <div className="pf-row">
+            <Input
+              label="Price"
+              type="number"
+              min="0"
+              step="0.01"
+              value={form.price}
+              onChange={update("price")}
+              hint="Price per unit. Must be above 0."
+              error={errors.price}
+              required
+            />
+            <Input
+              label="Quantity in stock"
+              type="number"
+              min="0"
+              step="1"
+              value={form.quantity}
+              onChange={update("quantity")}
+              hint="Whole number, 0 or more."
+              error={errors.quantity}
+              required
+            />
+          </div>
+
+          <Input
+            label="Low-stock threshold"
+            type="number"
+            min="0"
+            step="1"
+            value={form.threshold}
+            onChange={update("threshold")}
+            hint="You get a low-stock alert when quantity falls below this number"
+            error={errors.threshold}
+            required
+          />
+
+          <div className="pf-buttons">
+            <Button type="submit">Save product</Button>
+            <Button variant="secondary" onClick={goBack}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </section>
+  );
 }
