@@ -3,9 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Minus, Trash2, ShoppingCart, Search, AlertCircle } from 'lucide-react';
 import { Button, Tag } from '../components/ui';
 import { getStockStatus } from '../utils/stock';
+import { positiveNumber, wholeNumber } from '../utils/validators';
 import { CATEGORIES as SHARED_CATEGORIES } from '../data/categories';
 import { getProducts } from '../data/productService';
 import '../styles/sales.css';
+
+// Quantity validator using Success's validator functions
+function validateQuantity(quantity, maxStock, productName) {
+  const wholeErr = wholeNumber(quantity);
+  if (wholeErr) return `${productName}: ${wholeErr}`;
+  const posErr = positiveNumber(quantity);
+  if (posErr) return `${productName}: ${posErr}`;
+  if (Number(quantity) > maxStock) {
+    return `"${productName}" exceeds available stock (${maxStock} in stock).`;
+  }
+  return '';
+}
 
 export default function RecordSale() {
   const navigate = useNavigate();
@@ -39,15 +52,12 @@ export default function RecordSale() {
     });
   }, [products, searchTerm, selectedCategory]);
 
-  // Validation: check if any cart quantity exceeds available stock
+  // Validation: check if any cart quantity violates wholeNumber, positiveNumber or stock limits
   const stockErrors = useMemo(() => {
     const errors = [];
     saleItems.forEach((item) => {
-      if (item.quantity > item.maxStock) {
-        errors.push(`"${item.name}" exceeds available stock (${item.maxStock} in stock).`);
-      } else if (item.quantity <= 0 || isNaN(item.quantity)) {
-        errors.push(`Enter a valid quantity greater than 0 for "${item.name}".`);
-      }
+      const err = validateQuantity(item.quantity, item.maxStock, item.name);
+      if (err) errors.push(err);
     });
     return errors;
   }, [saleItems]);
@@ -281,17 +291,18 @@ export default function RecordSale() {
           ) : (
             <div className="sale-cart-list">
               {saleItems.map((item) => {
-                const hasError = item.quantity > item.maxStock || item.quantity <= 0;
+                const itemError = validateQuantity(item.quantity, item.maxStock, item.name);
                 return (
                   <div
                     key={item.productId}
-                    className={`sale-cart-item ${hasError ? 'sale-cart-item--error' : ''}`}
+                    className={`sale-cart-item ${itemError ? 'sale-cart-item--error' : ''}`}
                   >
                     <div className="sale-cart-item-info">
                       <div className="sale-cart-item-title">{item.name}</div>
                       <div className="sale-cart-item-meta">
                         GH₵ {item.price.toFixed(2)} each &bull; Stock: {item.maxStock}
                       </div>
+                      {itemError && <div className="field__error">{itemError}</div>}
                     </div>
 
                     <div className="sale-qty-control">
