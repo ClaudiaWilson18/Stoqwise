@@ -2,52 +2,42 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Minus, Trash2, ShoppingCart, Search, AlertCircle } from 'lucide-react';
 import { Button, Tag } from '../components/ui';
+import { getStockStatus } from '../utils/stock';
+import { CATEGORIES as SHARED_CATEGORIES } from '../data/categories';
+import { getProducts } from '../data/productService';
 import '../styles/sales.css';
-
-// Hard-coded mock products for Phase 1 (23 Nov - 25 Nov)
-// Connects to useProducts() and Alfred's service layer on 28 Nov
-const PRODUCTS = [
-  { id: 1, name: 'Milo Tin 400g', category: 'Beverages', price: 38.5, quantity: 42, threshold: 10 },
-  { id: 2, name: 'Gino Tomato Paste', category: 'Groceries', price: 4.0, quantity: 8, threshold: 15 },
-  { id: 3, name: 'Frytol Cooking Oil 1L', category: 'Groceries', price: 32.0, quantity: 27, threshold: 10 },
-  { id: 4, name: 'Paracetamol 500mg (pack)', category: 'Pharmacy', price: 6.5, quantity: 0, threshold: 20 },
-  { id: 5, name: 'Vitamin C Tablets', category: 'Pharmacy', price: 18.0, quantity: 12, threshold: 12 },
-  { id: 6, name: 'Brake Pads (set)', category: 'Spare parts', price: 120.0, quantity: 14, threshold: 5 },
-  { id: 7, name: 'Engine Oil 4L', category: 'Spare parts', price: 185.0, quantity: 3, threshold: 6 },
-  { id: 8, name: 'Bottled Water 1.5L', category: 'Beverages', price: 5.0, quantity: 96, threshold: 24 },
-];
-
-const CATEGORIES = ['All', 'Beverages', 'Groceries', 'Pharmacy', 'Spare parts'];
-
-function getStockStatus(product) {
-  if (product.quantity === 0) return 'Out of stock';
-  if (product.quantity <= product.threshold) return 'Low stock';
-  return 'In stock';
-}
 
 export default function RecordSale() {
   const navigate = useNavigate();
+
+  // Load products from Alfred's product service (localStorage with seed fallback)
+  const [products] = useState(() => getProducts());
+  const categories = useMemo(() => ['All', ...SHARED_CATEGORIES], []);
 
   // Search & filter states
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   // Current sale items state (pre-filled with sample items for initial sketch demonstration)
-  const [saleItems, setSaleItems] = useState([
-    { productId: 1, name: 'Milo Tin 400g', price: 38.5, quantity: 2, maxStock: 42 },
-    { productId: 8, name: 'Bottled Water 1.5L', price: 5.0, quantity: 4, maxStock: 96 },
-  ]);
+  const [saleItems, setSaleItems] = useState(() => {
+    const p1 = products.find((p) => p.id === 1) || products[0];
+    const p2 = products.find((p) => p.id === 8) || products[1];
+    return [
+      { productId: p1.id, name: p1.name, price: p1.price, quantity: 2, maxStock: p1.quantity },
+      { productId: p2.id, name: p2.name, price: p2.price, quantity: 4, maxStock: p2.quantity },
+    ];
+  });
 
   // Filter products on the left
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((p) => {
+    return products.filter((p) => {
       const matchesSearch =
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.category.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchTerm, selectedCategory]);
+  }, [products, searchTerm, selectedCategory]);
 
   // Validation: check if any cart quantity exceeds available stock
   const stockErrors = useMemo(() => {
@@ -201,7 +191,7 @@ export default function RecordSale() {
               onChange={(e) => setSelectedCategory(e.target.value)}
               aria-label="Filter by category"
             >
-              {CATEGORIES.map((cat) => (
+              {categories.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat === 'All' ? 'All categories' : cat}
                 </option>
